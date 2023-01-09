@@ -9,27 +9,27 @@
 		},
 		{
 			"key": "identityProviderUrl",
-			"value": "0.0.0.0:8002",
+			"value": "dev-7utq72oqnt1jzo1v.us.auth0.com",
 			"enabled": true
 		},
 		{
 			"key": "username",
-			"value": "",
+			"value": "test@a.com",
 			"enabled": true
 		},
 		{
 			"key": "password",
-			"value": "",
+			"value": "Siemens1342",
 			"enabled": true
 		},
 		{
 			"key": "clientId",
-			"value": "",
+			"value": "R4Ik3OFFcTthetJK8h8NxNBrJnV5IiRC",
 			"enabled": true
 		},
 		{
 			"key": "clientSecret",
-			"value": "",
+			"value": "NUyz1JGyiIbKucUY_Tp36giXV7AboJFqr4KRvDhBWpRk5AyxiK5dUdS66BNnOKex",
 			"enabled": true
 		}
 	],
