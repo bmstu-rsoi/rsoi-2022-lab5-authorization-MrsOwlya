@@ -4,12 +4,12 @@
 	"values": [
 		{
 			"key": "serviceUrl",
-			"value": "51.250.94.208",
+			"value": "https://51.250.94.208",
 			"enabled": true
 		},
 		{
 			"key": "identityProviderUrl",
-			"value": "dev-7utq72oqnt1jzo1v.us.auth0.com",
+			"value": "https://dev-7utq72oqnt1jzo1v.us.auth0.com",
 			"enabled": true
 		},
 		{
@@ -24,13 +24,18 @@
 		},
 		{
 			"key": "clientId",
-			"value": "R4Ik3OFFcTthetJK8h8NxNBrJnV5IiRC",
+			"value": "em8UwMh7FjM7ybFeCDQYz59iVaBECQ44",
 			"enabled": true
 		},
 		{
 			"key": "clientSecret",
-			"value": "NUyz1JGyiIbKucUY_Tp36giXV7AboJFqr4KRvDhBWpRk5AyxiK5dUdS66BNnOKex",
+			"value": "JwksTS1B8gGwnZ0y38VX-VwoT_5Ib9Qa24IwiQQvINbRyr46tvuou67KKetoeooT",
 			"enabled": true
+		},
+		{
+		  "key": "audience",
+		  "value": "https://dev-7utq72oqnt1jzo1v.us.auth0.com/api/v2/",
+		  "enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
