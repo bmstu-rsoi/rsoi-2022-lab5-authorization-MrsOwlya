@@ -1,0 +1,31 @@
+version: 13
+port: 5432
+
+default_database:
+  name: postgres
+  user: postgres
+  password: postgres
+
+users:
+  - name: postgres
+    password: postgres
+  - name: program
+    password: test
+
+databases:
+  - name: flights
+    user: program
+
+  - name: tickets
+    user: program
+
+  - name: privileges
+    user: program
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi

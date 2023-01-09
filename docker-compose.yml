@@ -1,0 +1,56 @@
+version: "3"
+services:
+  db:
+    image: library/postgres:13
+    container_name: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres/:/docker-entrypoint-initdb.d/
+    ports:
+      - "5432:5432"
+
+  gateway:
+    image: mrsowlya/gateway:latest
+    container_name: gateway
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  ticket:
+    image: mrsowlya/ticket:latest
+    container_name: ticket
+    restart: on-failure
+    ports:
+      - "8070:8070"
+    depends_on:
+      - db
+
+  flight:
+    image: mrsowlya/flight:latest
+    container_name: flight
+    restart: on-failure
+    ports:
+      - "8060:8060"
+    depends_on:
+      - db
+
+  bonus:
+    image: mrsowlya/bonus:latest
+    container_name: bonus
+    restart: on-failure
+    ports:
+      - "8050:8050"
+    depends_on:
+      - db
+
+# TODO добавить сервисы
+
+volumes:
+  db-data:

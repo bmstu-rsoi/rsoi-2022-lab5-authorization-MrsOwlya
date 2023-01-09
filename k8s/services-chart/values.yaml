@@ -1,0 +1,31 @@
+bonus:
+  service:
+    port: 8050
+    image:
+      name: mrsowlya/bonus
+      version: "latest"
+    database:
+      name: privileges
+flight:
+  service:
+    port: 8060
+    image:
+      name: mrsowlya/flight
+      version: "latest"
+    database:
+      name: flights
+ticket:
+  service:
+    port: 8070
+    image:
+      name: mrsowlya/ticket
+      version: "latest"
+    database:
+      name: tickets
+gateway:
+  service:
+    port: 8080
+    image:
+      name: mrsowlya/gateway
+      version: "latest"
+    isGateway: true
