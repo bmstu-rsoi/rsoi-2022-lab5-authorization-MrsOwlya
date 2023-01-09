@@ -38,7 +38,7 @@ jobs:
           sleep 30
 
       - name: Keycloak in Docker
-        run: docker run -p 8002:8002 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:20.0.2 start-dev
+        run: docker run -p 8002:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:20.0.2 start-dev
 
       - name: Run API Tests
         uses: matt-ball/newman-action@master
