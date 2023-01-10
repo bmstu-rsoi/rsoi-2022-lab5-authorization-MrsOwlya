@@ -37,20 +37,22 @@ def check_user(request):
 @api_view(['GET'])
 def flights_list(request):
     token = oauth.auth0.authorize_access_token(request)
-    # print(token)
-    # flights = requests.get(
-    #     'http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights?page={}&size={}'.format(
-    #         request.GET.get('page')
-    #         , request.GET.get('size')))
-    # f = flights.json().append({'token': token})
-    # f.append({'token': token})
-    return JsonResponse({'token': token}, status=status.HTTP_205_RESET_CONTENT, safe=False)
+    if token['userinfo']:
+        flights = requests.get(
+            'http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights?page={}&size={}'.format(
+                request.GET.get('page')
+                , request.GET.get('size')))
+        f = flights.json().append({'token': token})
+        f.append({'token': token})
+        return JsonResponse(flights.json(), status=flights.status_code, safe=False)
+    return JsonResponse({'message': 'unauthorized'}, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 
 @api_view(['GET'])
 def user_info(request):
-    user = check_user(request)
-    if user:
+    token = oauth.auth0.authorize_access_token(request)
+    if token['userinfo']:
+        user = json.dumps(token['userinfo'])
         tickets = requests.get('http://' + os.environ.get('TICKET', 'localhost') + ':8070/api/v1/user_tickets'
                                , headers={'X-User-Name': f'{user}'})
         if tickets.status_code == 200:
@@ -85,19 +87,20 @@ def user_info(request):
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
             return JsonResponse(info.json(), status=info.status_code)
         return JsonResponse(tickets.json(), status=tickets.status_code)
-    return JsonResponse({'message': 'user is necessary'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
+    return JsonResponse({'message': 'unauthorized'}, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 
 @api_view(['GET'])
 def privilege_info(request):
-    user = check_user(request)
-    if user:
+    token = oauth.auth0.authorize_access_token(request)
+    if token['userinfo']:
+        user = json.dumps(token['userinfo'])
         info = requests.get("http://" + os.environ.get('BONUS', 'localhost') + ":8050/api/v1/balance_and_history"
                             , headers={'X-User-Name': f'{user}'})
         if info.status_code == 200:
             return JsonResponse(info.json(), status=status.HTTP_200_OK, safe=False)
         return JsonResponse(info.json(), status=info.status_code, safe=False)
-    return JsonResponse({'message': 'user is necessary'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
+    return JsonResponse({'message': 'unauthorized'}, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 
 @api_view(['GET', 'POST'])
