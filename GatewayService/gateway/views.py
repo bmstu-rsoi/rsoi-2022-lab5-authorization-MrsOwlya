@@ -44,7 +44,7 @@ def flights_list(request):
     #         , request.GET.get('size')))
     # f = flights.json().append({'token': token})
     # f.append({'token': token})
-    return JsonResponse({'token': token}, status=flights.status_code, safe=False)
+    return JsonResponse({'token': token}, status=status.HTTP_205_RESET_CONTENT, safe=False)
 
 
 @api_view(['GET'])
