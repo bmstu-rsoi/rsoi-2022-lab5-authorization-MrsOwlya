@@ -36,6 +36,8 @@ def check_user(request):
 
 @api_view(['GET'])
 def flights_list(request):
+    token = oauth.auth0.authorize_access_token(request)
+    print(token)
     flights = requests.get(
         'http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights?page={}&size={}'.format(
             request.GET.get('page')

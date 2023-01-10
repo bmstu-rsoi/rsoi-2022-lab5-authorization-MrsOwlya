@@ -7,7 +7,7 @@ urlpatterns = [
     path('flights', views.flights_list),
     path('me', views.user_info),
     path('privilege', views.privilege_info),
-    path("authorize", views.login, name="login"),
+    path("login", views.login, name="login"),
     path("logout", views.logout, name="logout"),
     path("callback", views.callback, name="callback"),
 ]
