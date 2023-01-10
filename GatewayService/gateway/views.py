@@ -42,7 +42,8 @@ def flights_list(request):
         'http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights?page={}&size={}'.format(
             request.GET.get('page')
             , request.GET.get('size')))
-    return JsonResponse(flights.json(), status=flights.status_code, safe=False)
+    f = flights.json().append({'token':token})
+    return JsonResponse(f, status=flights.status_code, safe=False)
 
 
 @api_view(['GET'])
