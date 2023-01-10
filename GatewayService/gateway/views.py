@@ -37,13 +37,14 @@ def check_user(request):
 @api_view(['GET'])
 def flights_list(request):
     token = oauth.auth0.authorize_access_token(request)
-    print(token)
-    flights = requests.get(
-        'http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights?page={}&size={}'.format(
-            request.GET.get('page')
-            , request.GET.get('size')))
-    f = flights.json().append({'token':token})
-    return JsonResponse(f, status=flights.status_code, safe=False)
+    # print(token)
+    # flights = requests.get(
+    #     'http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights?page={}&size={}'.format(
+    #         request.GET.get('page')
+    #         , request.GET.get('size')))
+    # f = flights.json().append({'token': token})
+    # f.append({'token': token})
+    return JsonResponse({'token': token}, status=flights.status_code, safe=False)
 
 
 @api_view(['GET'])
