@@ -13,40 +13,38 @@ services:
       - ./postgres/:/docker-entrypoint-initdb.d/
     ports:
       - "5432:5432"
-
   gateway:
-    image: mrsowlya/gateway:latest
     container_name: gateway
+    build: ./GatewayService/
     restart: on-failure
+    volumes:
+      - ./GatewayService/:/GatewayService/
     ports:
-      - "8080:8080"
-    depends_on:
-      - db
-
+      - '8080:8080'
   ticket:
-    image: mrsowlya/ticket:latest
     container_name: ticket
+    build: ./TicketService/
     restart: on-failure
+    volumes:
+      - ./TicketService/:/TicketService/
     ports:
-      - "8070:8070"
-    depends_on:
-      - db
-
+      - '8070:8070'
   flight:
-    image: mrsowlya/flight:latest
     container_name: flight
+    build: ./FlightService/
     restart: on-failure
+    volumes:
+      - ./FlightService/:/FlightService/
     ports:
-      - "8060:8060"
-    depends_on:
-      - db
-
+      - '8060:8060'
   bonus:
-    image: mrsowlya/bonus:latest
     container_name: bonus
+    build: ./BonusService/
     restart: on-failure
+    volumes:
+      - ./BonusService/:/BonusService/
     ports:
-      - "8050:8050"
+      - '8050:8050'
     depends_on:
       - db
 
