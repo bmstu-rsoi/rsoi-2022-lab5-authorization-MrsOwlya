@@ -14,7 +14,7 @@
 		},
 		{
 			"key": "username",
-			"value": "test@a.com",
+			"value": "test2@a.com",
 			"enabled": true
 		},
 		{
@@ -34,7 +34,7 @@
 		},
 		{
 		  "key": "audience",
-		  "value": "https://dev-7utq72oqnt1jzo1v.us.auth0.com/api/v2/",
+		  "value": "https://mrsowlya_laba5/",
 		  "enabled": true
 		}
 	],
