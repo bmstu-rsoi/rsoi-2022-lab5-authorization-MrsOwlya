@@ -16,10 +16,13 @@ validator = validator.Auth0JWTBearerTokenValidator(
 )
 require_auth.register_token_validator(validator)
 
+
 def get_user_from_token(request):
-    token = request.headers.get('HTTP_AUTHORIZATION')
+    token = request.META.get('HTTP_AUTHORIZATION')
     user = jwt.decode(token[7:], options={"verify_signature": False})['sub']
     return user
+
+
 # Create your views here.
 @api_view(['GET'])
 @require_auth(None)
