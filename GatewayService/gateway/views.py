@@ -52,7 +52,7 @@ def user_info(request):
         ts = []
         for t in tickets:
             fl = requests.get('http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights/{}'.format(
-                t['flight_number']))
+                t['flight_number']), headers={'Authorization': request.headers.get('Authorization')})
             if fl.status_code == 200:
                 fl = fl.json()
                 data = {
@@ -103,7 +103,7 @@ def user_tickets_or_buy(request):
             for t in user_tickets:
                 fl = requests.get(
                     "http://" + os.environ.get('FLIGHT', 'localhost') + ":8060/api/v1/flights/{}".format(
-                        t['flight_number']))
+                        t['flight_number']), headers={'Authorization': request.headers.get('Authorization')})
                 if fl.status_code == 200:
                     fl = fl.json()
                     data = {
@@ -120,7 +120,7 @@ def user_tickets_or_buy(request):
         return JsonResponse(user_tickets.json(), status=user_tickets.status_code, safe=False)
     if request.method == 'POST':
         flight = requests.get("http://" + os.environ.get('FLIGHT', 'localhost') + ":8060/api/v1/flights/{}".format(
-            request.data["flightNumber"]))
+            request.data["flightNumber"]), headers={'Authorization': request.headers.get('Authorization')})
         if flight.status_code != 200 or int(flight.json()['price']) != int(request.data["price"]):
             return JsonResponse({'message': 'no flight'}, status=status.HTTP_404_NOT_FOUND, safe=False)
         ticket = requests.post("http://" + os.environ.get('TICKET', 'localhost') + ":8070/api/v1/buy_ticket",
@@ -155,7 +155,7 @@ def user_ticket_info_or_cancel(request, ticketId):
         if user_ticket.status_code == 200:
             user_ticket = user_ticket.json()
             fl = requests.get("http://" + os.environ.get('FLIGHT', 'localhost') + ":8060/api/v1/flights/{}".format(
-                user_ticket['flight_number']))
+                user_ticket['flight_number']), headers={'Authorization': request.headers.get('Authorization')})
             if fl.status_code == 200:
                 fl = fl.json()
                 data = {
