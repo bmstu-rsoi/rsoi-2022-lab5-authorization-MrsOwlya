@@ -1,13 +1,25 @@
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from .models import Ticket
 from .serializers import TicketSerializer
+import jwt
+from authlib.integrations.django_oauth2 import ResourceProtector
+from . import validator
+
+require_auth = ResourceProtector()
+validator = validator.Auth0JWTBearerTokenValidator(
+    settings.AUTH0_DOMAIN,
+    settings.AUTH0_AUDIENCE
+)
+require_auth.register_token_validator(validator)
 
 
 # Create your views here.
 @api_view(['GET'])
+@require_auth(None)
 def user_tickets(request):
     user = request.headers['X-User-Name']
     tickets = Ticket.objects.filter(username=user)
@@ -19,6 +31,7 @@ def user_tickets(request):
 
 
 @api_view(['GET'])
+@require_auth(None)
 def one_ticket_info(request, ticketId):
     user = request.headers['X-User-Name']
     try:
@@ -30,6 +43,7 @@ def one_ticket_info(request, ticketId):
 
 
 @api_view(['POST'])
+@require_auth(None)
 def buy_ticket(request):
     user = request.headers['X-User-Name']
     try:
@@ -54,6 +68,7 @@ def buy_ticket(request):
 
 
 @api_view(['PATCH'])
+@require_auth(None)
 def cancel_ticket(request, ticketId):
     user = request.headers['X-User-Name']
     try:

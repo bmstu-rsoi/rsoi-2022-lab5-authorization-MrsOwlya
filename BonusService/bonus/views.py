@@ -1,11 +1,21 @@
 import datetime
-
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from .models import Privilege, PrivilegeHistory
 from .serializers import PrivilegeSerializer, PrivilegeHistorySerializer
+import jwt
+from authlib.integrations.django_oauth2 import ResourceProtector
+from . import validator
+
+require_auth = ResourceProtector()
+validator = validator.Auth0JWTBearerTokenValidator(
+    settings.AUTH0_DOMAIN,
+    settings.AUTH0_AUDIENCE
+)
+require_auth.register_token_validator(validator)
 
 
 # Create your views here.
@@ -27,6 +37,7 @@ def add_to_history(privilege, ticket, balance_diff, op):
 
 
 @api_view(['GET'])
+@require_auth(None)
 def show_user_info(request):
     user = request.headers['X-User-Name']
     try:
@@ -38,6 +49,7 @@ def show_user_info(request):
 
 
 @api_view(['GET'])
+@require_auth(None)
 def show_user_info_and_history(request):
     user = request.headers['X-User-Name']
     try:
@@ -63,6 +75,7 @@ def show_user_info_and_history(request):
 
 
 @api_view(['PATCH'])
+@require_auth(None)
 def count_bonuses(request):
     global balance_diff, op, payByBonuses, payByMoney
     user = request.headers['X-User-Name']
@@ -106,6 +119,7 @@ def count_bonuses(request):
 
 
 @api_view(['PATCH'])
+@require_auth(None)
 def count_bonuses_from_return(request, ticket):
     user = request.headers['X-User-Name']
     try:

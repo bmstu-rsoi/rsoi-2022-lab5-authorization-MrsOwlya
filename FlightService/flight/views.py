@@ -1,13 +1,25 @@
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from .serializers import AirportSerializer, FlightSerializer
 from .models import Airport, Flight
+import jwt
+from authlib.integrations.django_oauth2 import ResourceProtector
+from . import validator
+
+require_auth = ResourceProtector()
+validator = validator.Auth0JWTBearerTokenValidator(
+    settings.AUTH0_DOMAIN,
+    settings.AUTH0_AUDIENCE
+)
+require_auth.register_token_validator(validator)
 
 
 # Create your views here.
 @api_view(['GET'])
+@require_auth(None)
 def flights_page(request):
     page = int(request.GET.get('page'))
     size = int(request.GET.get('size'))
@@ -38,6 +50,7 @@ def flights_page(request):
 
 
 @api_view(['GET'])
+@require_auth(None)
 def flight_info(request, flightNum):
     try:
         flight = Flight.objects.get(flight_number=flightNum)
