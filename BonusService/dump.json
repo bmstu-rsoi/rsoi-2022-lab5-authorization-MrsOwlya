@@ -19,7 +19,7 @@
 },
 {
   "model": "bonus.privilege",
-  "pk": 2,
+  "pk": 3,
   "fields": {
     "username": "auth0|63bd33c830253100218befed",
     "status": "GOLD",
