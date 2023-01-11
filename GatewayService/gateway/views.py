@@ -28,6 +28,7 @@ def check_user(request):
 def get_user_from_token(request):
     token = request.META.get('HTTP_AUTHORIZATION')
     user = jwt.decode(token[7:], options={"verify_signature": False})['sub']
+    print(user)
     return user
 
 
@@ -37,16 +38,15 @@ def flights_list(request):
     flights = requests.get(
         'http://' + os.environ.get('FLIGHT', 'localhost') + ':8060/api/v1/flights?page={}&size={}'.format(
             request.GET.get('page')
-            , request.GET.get('size')))
+            , request.GET.get('size')), headers={'Authorization': request.headers.get('Authorization')})
     return JsonResponse(flights.json(), status=flights.status_code, safe=False)
 
 
 @api_view(['GET'])
 @require_auth(None)
 def user_info(request):
-    user = get_user_from_token(request)
     tickets = requests.get('http://' + os.environ.get('TICKET', 'localhost') + ':8070/api/v1/user_tickets'
-                           , headers={'X-User-Name': f'{user}'})
+                           , headers={'Authorization': request.headers.get('Authorization')})
     if tickets.status_code == 200:
         tickets = tickets.json()
         ts = []
@@ -66,7 +66,7 @@ def user_info(request):
                 }
                 ts.append(data)
         info = requests.get("http://" + os.environ.get('BONUS', 'localhost') + ":8050/api/v1/user_info"
-                            , headers={'X-User-Name': f'{user}'})
+                            , headers={'Authorization': request.headers.get('Authorization')})
         if info.status_code == 200:
             info = info.json()
             data = {
@@ -84,9 +84,8 @@ def user_info(request):
 @api_view(['GET'])
 @require_auth(None)
 def privilege_info(request):
-    user = get_user_from_token(request)
     info = requests.get("http://" + os.environ.get('BONUS', 'localhost') + ":8050/api/v1/balance_and_history"
-                        , headers={'X-User-Name': f'{user}'})
+                        , headers={'Authorization': request.headers.get('Authorization')})
     if info.status_code == 200:
         return JsonResponse(info.json(), status=status.HTTP_200_OK, safe=False)
     return JsonResponse(info.json(), status=info.status_code, safe=False)
@@ -95,10 +94,9 @@ def privilege_info(request):
 @api_view(['GET', 'POST'])
 @require_auth(None)
 def user_tickets_or_buy(request):
-    user = get_user_from_token(request)
     if request.method == 'GET':
         user_tickets = requests.get("http://" + os.environ.get('TICKET', 'localhost') + ":8070/api/v1/user_tickets"
-                                    , headers={'X-User-Name': f'{user}'})
+                                    , headers={'Authorization': request.headers.get('Authorization')})
         if user_tickets.status_code == 200:
             user_tickets = user_tickets.json()
             ts = []
@@ -127,7 +125,7 @@ def user_tickets_or_buy(request):
             return JsonResponse({'message': 'no flight'}, status=status.HTTP_404_NOT_FOUND, safe=False)
         ticket = requests.post("http://" + os.environ.get('TICKET', 'localhost') + ":8070/api/v1/buy_ticket",
                                data=request.data,
-                               headers={'X-User-Name': f'{user}'})
+                               headers={'Authorization': request.headers.get('Authorization')})
         if ticket.status_code != 201:
             return JsonResponse(ticket.json(), status=ticket.status_code, safe=False)
         count_bonus = requests.patch("http://" + os.environ.get('BONUS', 'localhost') + ":8050/api/v1/count_bonuses"
@@ -136,7 +134,7 @@ def user_tickets_or_buy(request):
                 "price": request.data["price"],
                 "ticketUid": ticket.json()["ticketUid"]
             }
-                                     , headers={'X-User-Name': f'{user}'})
+                                     , headers={'Authorization': request.headers.get('Authorization')})
 
         if count_bonus.status_code != 200:
             return JsonResponse(count_bonus.json(), status=count_bonus.status_code, safe=False)
@@ -150,11 +148,10 @@ def user_tickets_or_buy(request):
 @api_view(['GET', 'DELETE'])
 @require_auth(None)
 def user_ticket_info_or_cancel(request, ticketId):
-    user = get_user_from_token(request)
     if request.method == 'GET':
         user_ticket = requests.get(
             "http://" + os.environ.get('TICKET', 'localhost') + ":8070/api/v1/one_ticket_info/{}".format(ticketId)
-            , headers={'X-User-Name': f'{user}'})
+            , headers={'Authorization': request.headers.get('Authorization')})
         if user_ticket.status_code == 200:
             user_ticket = user_ticket.json()
             fl = requests.get("http://" + os.environ.get('FLIGHT', 'localhost') + ":8060/api/v1/flights/{}".format(
@@ -175,13 +172,13 @@ def user_ticket_info_or_cancel(request, ticketId):
     if request.method == 'DELETE':
         ret_ticket = requests.patch(
             "http://" + os.environ.get('TICKET', 'localhost') + ":8070/api/v1/cancel_ticket/{}".format(ticketId)
-            , headers={'X-User-Name': f'{user}'})
+            , headers={'Authorization': request.headers.get('Authorization')})
         if ret_ticket.status_code != 204:
             return JsonResponse({'message': 'can\'t cancel ticket'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
         turn_bonus = requests.patch(
             "http://" + os.environ.get('BONUS', 'localhost') + ":8050/api/v1/count_bonuses_from_return/{}".format(
                 ticketId)
-            , headers={'X-User-Name': f'{user}'})
+            , headers={'Authorization': request.headers.get('Authorization')})
         if turn_bonus.status_code != 200:
             return JsonResponse({'message': 'can\'t count bonus'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
         return JsonResponse({'message': 'Ticket successfully cancelled'}, status=status.HTTP_204_NO_CONTENT

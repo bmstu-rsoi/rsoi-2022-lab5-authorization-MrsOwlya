@@ -16,12 +16,15 @@ validator = validator.Auth0JWTBearerTokenValidator(
 )
 require_auth.register_token_validator(validator)
 
-
+def get_user_from_token(request):
+    token = request.headers.get('HTTP_AUTHORIZATION')
+    user = jwt.decode(token[7:], options={"verify_signature": False})['sub']
+    return user
 # Create your views here.
 @api_view(['GET'])
 @require_auth(None)
 def user_tickets(request):
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     tickets = Ticket.objects.filter(username=user)
     if tickets is not None:
         serializer = TicketSerializer(tickets, many=True)
@@ -33,7 +36,7 @@ def user_tickets(request):
 @api_view(['GET'])
 @require_auth(None)
 def one_ticket_info(request, ticketId):
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     try:
         ticket = Ticket.objects.get(username=user, ticket_uid=ticketId)
         serializer = TicketSerializer(ticket, many=False)
@@ -45,7 +48,7 @@ def one_ticket_info(request, ticketId):
 @api_view(['POST'])
 @require_auth(None)
 def buy_ticket(request):
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     try:
         data = {
             "username": user,
@@ -70,7 +73,7 @@ def buy_ticket(request):
 @api_view(['PATCH'])
 @require_auth(None)
 def cancel_ticket(request, ticketId):
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     try:
         ticket = Ticket.objects.get(ticket_uid=ticketId, username=user)
         if ticket.status == 'PAID':

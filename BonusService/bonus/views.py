@@ -18,6 +18,13 @@ validator = validator.Auth0JWTBearerTokenValidator(
 require_auth.register_token_validator(validator)
 
 
+def get_user_from_token(request):
+    token = request.META.get('HTTP_AUTHORIZATION')
+    user = jwt.decode(token[7:], options={"verify_signature": False})['sub']
+    print(user)
+    return user
+
+
 # Create your views here.
 def add_to_history(privilege, ticket, balance_diff, op):
     try:
@@ -39,7 +46,7 @@ def add_to_history(privilege, ticket, balance_diff, op):
 @api_view(['GET'])
 @require_auth(None)
 def show_user_info(request):
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     try:
         info = Privilege.objects.get(username=user)
         serializer = PrivilegeSerializer(info, many=False)
@@ -51,7 +58,7 @@ def show_user_info(request):
 @api_view(['GET'])
 @require_auth(None)
 def show_user_info_and_history(request):
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     try:
         info = Privilege.objects.get(username=user)
         history = info.privilegehistory_set.all()
@@ -78,7 +85,7 @@ def show_user_info_and_history(request):
 @require_auth(None)
 def count_bonuses(request):
     global balance_diff, op, payByBonuses, payByMoney
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     try:
         user_bonus = Privilege.objects.get(username=user)
         price = int(request.data["price"])
@@ -115,13 +122,13 @@ def count_bonuses(request):
         add_to_history(user_bonus.id, request.data["ticketUid"], balance_diff, op)
         return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
-        return JsonResponse({'user': user,'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'user': user, 'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PATCH'])
 @require_auth(None)
 def count_bonuses_from_return(request, ticket):
-    user = request.headers['X-User-Name']
+    user = get_user_from_token(request)
     try:
         user_bonus = Privilege.objects.get(username=user)
         history = PrivilegeHistory.objects.filter(privilege_id=user_bonus.id, ticket_uid=ticket).order_by('-datetime')[
